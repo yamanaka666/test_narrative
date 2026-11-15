@@ -1,0 +1,163 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 680px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"color": "#E0E0E0", "id": "EXT_ENV", "label": "\u3010\u5916\u7684\u72b6\u6cc1 E_4\u3011\n\u60e8\u3081\u3055\u3068\u6016\u3055\u3067\u3044\u3063\u3071\u3044\u306b\u306a\u308a\u3001\u300e\u81ea\u5206\u306f\u5168\u304f\u5f79\u306b\u7acb", "shape": "box", "title": "\u5916\u7684\u72b6\u6cc1(\u30c8\u30ea\u30ac\u30fc): \u60e8\u3081\u3055\u3068\u6016\u3055\u3067\u3044\u3063\u3071\u3044\u306b\u306a\u308a\u3001\u300e\u81ea\u5206\u306f\u5168\u304f\u5f79\u306b\u7acb\u305f\u306a\u3044\u7121\u80fd\u306a\u4eba\u9593\u3060\u300f\u3068\u601d\u3044\u8fbc\u307f\u307e\u3057\u305f\u3002"}, {"color": "#D5E8D4", "id": "EXT_ACT", "label": "\u3010\u5916\u7684\u884c\u52d5 A_4\u3011\n\u4f55\u304b\u805e\u304d\u8fd4\u3057\u305f\u3089\u3055\u3089\u306b\u6012\u3089\u308c\u308b\u6c17\u304c\u3057\u3066\u3001\u8cea\u554f\u3082\u53cd", "shape": "box", "title": "\u5916\u7684\u884c\u52d5: \u4f55\u304b\u805e\u304d\u8fd4\u3057\u305f\u3089\u3055\u3089\u306b\u6012\u3089\u308c\u308b\u6c17\u304c\u3057\u3066\u3001\u8cea\u554f\u3082\u53cd\u8ad6\u3082\u305b\u305a\u300e\u308f\u304b\u308a\u307e\u3057\u305f\u300f\u3068\u3060\u3051\u8a00\u3063\u3066\u9ed9\u308a\u8fbc\u307f\u307e\u3057\u305f\u3002"}, {"color": "#4682B4", "id": "EF_fear", "label": "EF: fear", "shape": "diamond", "size": 22, "title": "WRIME\u611f\u60c5\u30d5\u30a3\u30eb\u30bf\u30fc: fear"}, {"color": "#4682B4", "id": "C_4_1", "label": "\u81ea\u5206\u306f\u5168\u304f\u5f79\u306b\u7acb\u305f\u306a\u3044\u7121\u80fd\u306a\u4eba\u9593\u3060\n[fear]", "shape": "ellipse", "title": "\u003cb\u003e\u81ea\u5206\u306f\u5168\u304f\u5f79\u306b\u7acb\u305f\u306a\u3044\u7121\u80fd\u306a\u4eba\u9593\u3060\u003c/b\u003e\u003cbr\u003e\u003cbr\u003e\u3010WRIME\u611f\u60c5\u30bf\u30b0\u3011\u003cbr\u003efear: 0.94"}, {"color": "#4682B4", "id": "C_4_2", "label": "\u308f\u304b\u308a\u307e\u3057\u305f\n[fear]", "shape": "ellipse", "title": "\u003cb\u003e\u308f\u304b\u308a\u307e\u3057\u305f\u003c/b\u003e\u003cbr\u003e\u003cbr\u003e\u3010WRIME\u611f\u60c5\u30bf\u30b0\u3011\u003cbr\u003efear: 0.94"}, {"color": "#4682B4", "id": "C_4_3", "label": "\u3044\u3063\u3071\u3044\u306b\n[fear]", "shape": "ellipse", "title": "\u003cb\u003e\u3044\u3063\u3071\u3044\u306b\u003c/b\u003e\u003cbr\u003e\u003cbr\u003e\u3010WRIME\u611f\u60c5\u30bf\u30b0\u3011\u003cbr\u003efear: 0.94"}, {"color": "#4682B4", "id": "C_4_4", "label": "\u60e8\u3081\u3055\u3068\u6016\u3055\u3067\u3044\u3063\u3071\u3044\u306b\u306a\u308a\n[fear]", "shape": "ellipse", "title": "\u003cb\u003e\u60e8\u3081\u3055\u3068\u6016\u3055\u3067\u3044\u3063\u3071\u3044\u306b\u306a\u308a\u003c/b\u003e\u003cbr\u003e\u003cbr\u003e\u3010WRIME\u611f\u60c5\u30bf\u30b0\u3011\u003cbr\u003efear: 0.94"}, {"color": "#4682B4", "id": "C_4_5", "label": "\u81ea\u5206\u306f\u5168\u304f\u5f79\u306b\u7acb\u305f\u306a\u3044\n[fear]", "shape": "ellipse", "title": "\u003cb\u003e\u81ea\u5206\u306f\u5168\u304f\u5f79\u306b\u7acb\u305f\u306a\u3044\u003c/b\u003e\u003cbr\u003e\u003cbr\u003e\u3010WRIME\u611f\u60c5\u30bf\u30b0\u3011\u003cbr\u003esadness: 0.07\u003cbr\u003efear: 0.92"}, {"color": "#F3E5F5", "id": "EXT_IMPACT", "label": "\u3010\u5f71\u97ff I_t = c_{t+1} - c_t\u3011\n\u30df\u30fc\u30c6\u30a3\u30f3\u30b0\u5f8c\u4fee\u6b63\u6848\u3092\u4f5c\u308d\u3046\u3068: +1.00\n\u307e\u305f\u30c0\u30e1\u51fa\u3057\u3055\u308c\u308b\u306e\u304c\u6016\u304f\u3066: +1.00", "shape": "box", "title": "\u81ea\u5206\u306f\u5168\u304f\u5f79\u306b\u7acb\u305f\u306a\u3044\u7121\u80fd\u306a\u4eba\u9593\u3060: +0.000\u003cbr\u003e\u308f\u304b\u308a\u307e\u3057\u305f: +0.000\u003cbr\u003e\u3044\u3063\u3071\u3044\u306b: +0.000\u003cbr\u003e\u60e8\u3081\u3055\u3068\u6016\u3055\u3067\u3044\u3063\u3071\u3044\u306b\u306a\u308a: +0.000\u003cbr\u003e\u81ea\u5206\u306f\u5168\u304f\u5f79\u306b\u7acb\u305f\u306a\u3044: +0.000\u003cbr\u003e\u30df\u30fc\u30c6\u30a3\u30f3\u30b0\u5f8c\u4fee\u6b63\u6848\u3092\u4f5c\u308d\u3046\u3068: +1.000\u003cbr\u003e\u307e\u305f\u30c0\u30e1\u51fa\u3057\u3055\u308c\u308b\u306e\u304c\u6016\u304f\u3066: +1.000"}]);
+                  edges = new vis.DataSet([{"arrows": "to", "color": "#AAAAAA", "dashes": true, "from": "EXT_ENV", "title": "\u8a8d\u77e5\u8a55\u4fa1\u30c8\u30ea\u30ac\u30fc", "to": "C_4_1", "width": 1}, {"arrows": "to", "color": "#AAAAAA", "dashes": true, "from": "C_4_5", "title": "\u610f\u601d\u6c7a\u5b9a\u30fb\u884c\u52d5\u51fa\u529b", "to": "EXT_ACT", "width": 1}, {"arrows": "to", "color": "blue", "dashes": false, "from": "C_4_1", "label": "+0.80", "title": "Layer: FCM\u003cbr\u003eWeight: +0.80\u003cbr\u003eReason: \u300e\u81ea\u5206\u306f\u5168\u304f\u5f79\u306b\u7acb\u305f\u306a\u3044\u7121\u80fd\u306a\u4eba\u9593\u3060\u300f\u3068\u3044\u3046\u8a8d\u77e5\u304c\u300e\u81ea\u5206\u306f\u5168\u304f\u5f79\u306b\u7acb\u305f\u306a\u3044\u300f\u3068\u3044\u3046\u8a8d\u77e5\u3092\u5f37\u5316\u3057\u3066\u3044\u308b\u3002", "to": "C_4_5", "value": 0.8, "width": 3.2}, {"arrows": "to", "color": "blue", "dashes": false, "from": "C_4_4", "label": "+0.70", "title": "Layer: FCM\u003cbr\u003eWeight: +0.70\u003cbr\u003eReason: \u300e\u60e8\u3081\u3055\u3068\u6016\u3055\u3067\u3044\u3063\u3071\u3044\u306b\u306a\u308a\u300f\u3068\u3044\u3046\u8a8d\u77e5\u304c\u300e\u3044\u3063\u3071\u3044\u306b\u300f\u3068\u3044\u3046\u8a8d\u77e5\u3092\u5f37\u5316\u3057\u3066\u3044\u308b\u3002", "to": "C_4_3", "value": 0.7, "width": 2.8}, {"arrows": "to", "color": "blue", "dashes": true, "from": "EF_fear", "label": "+0.85", "title": "Layer: EF\u003cbr\u003eWeight: +0.85\u003cbr\u003eReason: \u6050\u6016\u306e\u611f\u60c5\u304c\u300e\u81ea\u5206\u306f\u5168\u304f\u5f79\u306b\u7acb\u305f\u306a\u3044\u7121\u80fd\u306a\u4eba\u9593\u3060\u300f\u3068\u3044\u3046\u8a8d\u77e5\u3092\u5f37\u5316\u3057\u3066\u3044\u308b\u3002", "to": "C_4_1", "value": 0.85, "width": 3.4}, {"arrows": "to", "color": "blue", "dashes": true, "from": "EF_fear", "label": "+0.75", "title": "Layer: EF\u003cbr\u003eWeight: +0.75\u003cbr\u003eReason: \u6050\u6016\u306e\u611f\u60c5\u304c\u300e\u308f\u304b\u308a\u307e\u3057\u305f\u300f\u3068\u3044\u3046\u8a8d\u77e5\u3092\u5f37\u5316\u3057\u3066\u3044\u308b\u3002", "to": "C_4_2", "value": 0.75, "width": 3.0}, {"arrows": "to", "color": "#8E24AA", "from": "EXT_ACT", "title": "FCM\u69cb\u6210\u5909\u5316\uff08\u5f71\u97ff I_t\uff09", "to": "EXT_IMPACT", "width": 2}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "barnesHut": {
+            "avoidOverlap": 0,
+            "centralGravity": 0.35,
+            "damping": 0.09,
+            "gravitationalConstant": -2800,
+            "springConstant": 0.001,
+            "springLength": 150
+        },
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
